@@ -1,0 +1,68 @@
+/* Global layout */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    line-height: 1.6;
+    color: #222;
+    background-color: #fafafa;
+}
+
+/* Navigation */
+nav {
+    margin-bottom: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #0066cc;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Headings */
+h1 {
+    font-size: 2.2em;
+    margin-bottom: 0.2em;
+}
+
+h2 {
+    margin-top: 1.5em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 4px;
+}
+
+/* Lists */
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+/* Links */
+a {
+    color: #0066cc;
+}
+
+a:hover {
+    color: #004999;
+}
+
+/* Footer links */
+p a {
+    font-weight: bold;
+}
+
+/* Horizontal rule */
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
