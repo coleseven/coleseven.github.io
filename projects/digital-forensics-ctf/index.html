@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Forensics CTF</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a> |
+    <a href="/projects/">Projects</a> |
+    <a href="/blog/">Blog</a>
+</nav>
+<hr>
+
+<h1>Digital Forensics CTF</h1>
+
+<h2>Overview</h2>
+<p>
+    This project is a custom-built Digital Forensics Capture The Flag (CTF) event. This event was created and ran for the Digital Forensics undergraduate class at USCB.
+</p>
+
+<h2>Problem / Goal</h2>
+<p>
+    The goal was to design a somewhat realistic, educational CTF event that would challenge the student. This event is was created so that all students in the class would find some level of success.  
+</p>
+
+<h2>Approach</h2>
+<p>
+    Working with the professor of the Digital Forensics class, Dr. Comitz, we decided on having a 10 flag event. With the majority of the flags hidden in standalone files. 7 of the flags were hidden this way with the last 3 being contained in one file that required a multi-step process to find the flags.
+</p>
+
+<h2>Results / Outcome</h2>
+<p>
+    The outcome of the event was a success. All students that put effort into the event found some level of success. There were some issues with time but that was on the students as they had multiple days where they had 24/7 access to the files. The running of the event had minimal problems which was a huge improvement from last years CTF event(Rogue Telnet). The biggest problem was that one of the flags operated from a webserver and the students were interacting with this webserver from Raspberry Pi's. For whatever reason the Pi's or the USCB network have issues resolving nmap scans. We had this same issue last year during the Rogue Telnet event. Another issue, which I believe is related to the previous issue, was that the Pi's struggled to maintain connection to the internet. This was an issue when the student were turning in their screenshots from the event. The easy solution for this was for the students to use a flashdrive to get their files off of the Pi's and onto their normal computers.
+</p>
+
+<h2>Tools & Technologies</h2>
+<ul>
+    <li>Autopsy / FTK Imager</li>
+    <li>ExifTool</li>
+    <li>Steghide & Stegseek</li>
+    <li>Regripper</li>
+    <li>Notepad</li>
+    <li>grep</li>
+</ul>
+
+<h2>What I Learned & Reflection</h2>
+<p>
+    I learned that creating a CTF event that can cater to many skill levels is difficult. I am very easily able to create something everyone can do, but if I do this then there is a small handfull of students that fly through the event without any struggle. I can also do the flip side of this and make the event very hard. Making it so that only a small handfull of individuals could progress. This then results in a majority of the class being very frustrated. Finding the balance between these two ideas is very important. This event ended up being a bit too hard. I had about half the class find 9-10 flags and then the other half of the class was around 6-7 flags. I do not know how I could have made this much easier. The students that were successful finished the event in less than an hour, the students that struggled spent nearly 2 full class periods(90 minutes) to not find all the flags. I did create something for the people that made it through the event very quickly but I will talk about that in a different project.
+</p>
+
+<h2>Links</h2>
+<ul>
+    <li>
+        <a href="https://github.com/coleseven/Digital-Forensics-CTF" target="_blank">
+            GitHub Repository
+        </a>
+    </li>
+</ul>
+
+<p><a href="/projects/">Back to Projects</a></p>
+
+</body>
+</html>
