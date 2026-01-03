@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rogue Telnet CTF</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a> |
+    <a href="/projects/">Projects</a> |
+    <a href="/blog/">Blog</a>
+</nav>
+<hr>
+
+<h1>Rogue Telnet CTF</h1>
+
+<h2>Overview</h2>
+<p>
+    Rogue Telnet CTF is a simple telnet server ran on a very odd port. The goal of this event was for the students to use a nmap scan to identify the port the telnet server is running on, then connect to the server and look around at what they are able to see/do.
+</p>
+
+<h2>Problem / Goal</h2>
+<p>
+    The goal was to create a simple and easy introductory CTF event for an Ethical Hacking undergraduate class at USCB. I shot to make this doable by anybody that was in the class so long as they explored everything they were given access to. 
+</p>
+
+<h2>Approach</h2>
+<p>
+    I implemented a custom Telnet server that allowed unauthenticated access while
+    enforcing a strict whitelist of commands. Flags were hidden across the filesystem
+    and environment, requiring careful exploration rather than brute force.
+</p>
+
+<h2>Results / Outcome</h2>
+<p>
+    This CTF event went very well. I believe every student but one found every single flag. There was a very large issue though, and I am not 100% sure what is the cause. The issue is that when the students were doing the event, they were interacting with the telnet server from Raspberry Pi's. Whenever the Raspberry Pi's nmap scan, they don't always resolve the scan, so some students struggled to find the open port. I believe that creating a dedicated DNS would fix this problem.
+</p>
+
+<h2>Tools & Technologies</h2>
+<ul>
+    <li>Python</li>
+    <li>Custom Telnet server logic</li>
+    <li>Linux filesystem enumeration</li>
+</ul>
+
+<h2>What I Learned</h2>
+<p>
+    I learned that no matter how much you test or prepare that something will always end up going wrong. This isn't a bad thing but just something that needs to be planned for when creating/running a CTF event. 
+</p>
+
+<h2>Links</h2>
+<ul>
+    <li>
+        <a href="https://github.com/coleseven/Rogue-Telnet-CTF" target="_blank">
+            GitHub Repository
+        </a>
+    </li>
+</ul>
+
+<p><a href="/projects/">Back to Projects</a></p>
+
+</body>
+</html>
