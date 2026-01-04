@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mystery.jpeg CTF</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a> |
+    <a href="/projects/">Projects</a> |
+    <a href="/blog/">Blog</a>
+</nav>
+<hr>
+
+<h1>Mystery.jpeg CTF</h1>
+
+<h2>Overview</h2>
+<p>
+    Mystery.jpeg CTF is a continuation of the Digital Forensics CTF event. I created this as a challenge for any student that was able to complete the Digital Forensics CTF. This was a very challenging CTF that required the student to learn new tools and methods.
+</p>
+
+<h2>Problem / Goal</h2>
+<p>
+    My goal was to create a very challenging CTF. I wanted this to be something that wasn't necessarily achieveable. I feel it is important to build a level of resilience when tackling difficult problems and this was a great way to do so. I also wanted to create something for the students that flew through the Digital Forensics CTF. With the idea that I attempted to make the Digital Forensics CTF achievable for the whole class it meant that I couldn't challenge any of the high performers. Mystery.jpeg gave me a way to challenge the students that wanted it.
+</p>
+
+<h2>Approach</h2>
+<p>
+    I chose to create this whole CTF centered around one image. This one image contained a zip file that used Least Significant Bit steganography to embed the zip file. Within the zip file were an assortment of other files that each contained a flag. This CTF didn't really have a good flow to it, it was more so a bundle of stand alone challenges that needed to be solved. I don't think this was terrible but some of the flags were nearly impossible to identify without some hints. A fun part of this CTF is that I didn't hide flags but I hid pieces of evidence. These pieces of evidence then had the student solve a mystery of who hacked it? I took direct inspiration from Murdle and Whodunits. It made this CTF almost become a puzzle box and I thought that it was a fun addition that didn't change much of anything related to the CTF, they just had one extra logic puzzle to solve at the end.
+</p>
+
+<h2>Results / Outcome</h2>
+<p>
+    For this CTF I had two students that had some success with the CTF. I had one student that made it about half through and another that did complete it, but I had to guide them in certain portions of this. I think overall it was an absolute success. I didn't expect many people to want to attempt this CTF, and I didn't know if this CTF was at a level that the undergrads would have success with it. On the note of having to help the one student that made it through, I had 2 flags that weren't quite created equal to the rest. The first of these two flags was hidden directly in the mystery.jpeg image. This text is uncovered by doing a forward fourier transformation on the image. Then in the resulting frequency domain evidence was hidden. I'm unsure how the student would have been able to connect the dots and run a fourier transformation on the image, the only hint that they had was some weird looking corners of the image. The other flag that was a bit more difficult than the rest was a polyglot file. The file was a valid jpeg, a valid zip file and it was a carrier of raw DEFLATE compressed information. Without going into too much detail about it, for this flag you had to figure out that this file contained much more than met the eye. Then you had to figure out that there was DEFLATE compressed data in there, then inflate this data. Once you have the inflated data you have instructions that will tell you how to create a key and IV to decode a .enc file that contains the final piece of evidence. I didn't create this flag thinking anyone would be able to find it. It was mostly me getting to play around with ideas that I had learned. This was the only flag the student that made it through the CTF did not complete. But this individual made an educated guess based off the rest of the evidence they had collected and solved the mystery.
+</p>
+
+<h2>Tools & Technologies</h2>
+<ul>
+    <li>ExifTool</li>
+    <li>Hex editors</li>
+    <li>Steganography utilities</li>
+</ul>
+
+<h2>What I Learned</h2>
+<p>
+    I learned that I really enjoy creating puzzles and challenges. I think it is very engaging and the creation of this CTF was nothing but fun for me. I got to learn a large amount about polyglot files, which was something that I had minimal experience with. I also learned that not everyone will shy away from a very difficult challenge, some people will happily run towards it. I want to be around people that run towards it.
+</p>
+
+<h2>Links</h2>
+<ul>
+    <li>
+        <a href="https://github.com/coleseven/Mystery.jpeg-CTF" target="_blank">
+            GitHub Repository
+        </a>
+    </li>
+</ul>
+
+<p><a href="/projects/">Back to Projects</a></p>
+
+</body>
+</html>
+
+
