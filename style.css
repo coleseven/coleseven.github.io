@@ -1,68 +1,241 @@
-/* Global layout */
+/* ===== Design tokens ===== */
+:root {
+    --accent: #2563eb;
+    --accent-dark: #1a4bc0;
+    --text: #1f2328;
+    --muted: #57606a;
+    --border: #e6e8eb;
+    --bg: #ffffff;
+    --bg-soft: #f6f8fa;
+    --radius: 10px;
+    --content-width: 800px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-    line-height: 1.6;
-    color: #222;
-    background-color: #fafafa;
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 24px 64px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Navigation */
-nav {
-    margin-bottom: 20px;
+/* ===== Header / nav ===== */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 0;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
 }
 
-nav a {
+.site-header .brand {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
     text-decoration: none;
-    color: #0066cc;
-    font-weight: bold;
-    margin-right: 10px;
+    letter-spacing: -0.01em;
 }
 
-nav a:hover {
-    text-decoration: underline;
+.site-header nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-left: 24px;
+    transition: color 0.15s ease;
 }
 
-/* Headings */
+.site-header nav a:first-child { margin-left: 0; }
+.site-header nav a:hover { color: var(--accent); }
+
+/* ===== Typography ===== */
 h1 {
-    font-size: 2.2em;
-    margin-bottom: 0.2em;
+    font-size: 2rem;
+    line-height: 1.2;
+    margin: 0.2em 0 0.5em;
+    letter-spacing: -0.02em;
+    font-weight: 700;
 }
 
 h2 {
-    margin-top: 1.5em;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 4px;
+    font-size: 1.3rem;
+    margin: 2em 0 0.5em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
-/* Lists */
-ul {
-    padding-left: 20px;
+h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.4em;
+    font-weight: 600;
 }
 
-li {
-    margin-bottom: 6px;
+p { margin: 0 0 1em; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-dark); text-decoration: underline; }
+
+strong { font-weight: 600; }
+
+/* ===== Hero (homepage) ===== */
+.hero { padding: 4px 0 8px; }
+
+.hero .tagline {
+    font-size: 1.15rem;
+    color: var(--muted);
+    margin: 0.2em 0 1.5em;
+    line-height: 1.5;
 }
 
-/* Links */
-a {
-    color: #0066cc;
+/* ===== Button ===== */
+.button {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.15s ease;
 }
 
-a:hover {
-    color: #004999;
+.button:hover { background: var(--accent-dark); color: #fff; text-decoration: none; }
+
+/* ===== Tech tags ===== */
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    list-style: none;
+    padding: 0;
+    margin: 14px 0 24px;
 }
 
-/* Footer links */
-p a {
-    font-weight: bold;
+.tag {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    line-height: 1.5;
+    font-weight: 500;
 }
 
-/* Horizontal rule */
-hr {
-    border: none;
-    border-top: 1px solid #ddd;
-    margin: 20px 0;
+.tag-lang   { background: #e6f1fb; color: #0c447c; }
+.tag-tool   { background: #e1f5ee; color: #085041; }
+.tag-tech   { background: #eeedfe; color: #3c3489; }
+.tag-system { background: #faeeda; color: #633806; }
+
+/* ===== Tag legend ===== */
+.tag-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 12px 0 22px;
+    padding: 0;
+    list-style: none;
+}
+
+.tag-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+}
+
+.tag-legend .swatch {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* ===== Project cards ===== */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 22px 0;
+}
+
+.project-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.project-card:hover {
+    border-color: #cdd3f0;
+    box-shadow: 0 6px 20px rgba(30, 40, 90, 0.08);
+    transform: translateY(-2px);
+}
+
+.project-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
+.project-card h3 a { color: var(--text); text-decoration: none; }
+.project-card:hover h3 a { color: var(--accent); }
+
+.project-card .summary {
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin: 0 0 14px;
+    line-height: 1.5;
+}
+
+.project-card .tech-tags { margin: 0; }
+
+/* ===== Skills ===== */
+.skills-group { margin-bottom: 16px; }
+
+.skills-group .skills-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ===== Content lists ===== */
+ul:not(.tech-tags):not(.tag-legend):not(.project-grid) { padding-left: 20px; }
+li { margin-bottom: 5px; }
+
+/* ===== Back link ===== */
+.back-link { display: inline-block; margin-top: 12px; font-size: 0.9rem; }
+
+/* ===== Footer ===== */
+.site-footer {
+    margin-top: 56px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.site-footer a { color: var(--muted); text-decoration: none; }
+.site-footer a:hover { color: var(--accent); text-decoration: underline; }
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+    h1 { font-size: 1.6rem; }
+    .site-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .site-header nav a { margin-left: 0; margin-right: 20px; }
 }

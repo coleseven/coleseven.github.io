@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpsPilot — Cole Jones</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
+
+<h1>OpsPilot</h1>
+
+<ul class="tech-tags">
+    <li class="tag tag-lang">Python 3.12</li>
+    <li class="tag tag-lang">TypeScript</li>
+    <li class="tag tag-lang">SQL</li>
+    <li class="tag tag-tool">FastAPI</li>
+    <li class="tag tag-tool">Pydantic v2</li>
+    <li class="tag tag-tool">SQLAlchemy</li>
+    <li class="tag tag-tool">React 19</li>
+    <li class="tag tag-tool">Vite</li>
+    <li class="tag tag-tool">Pytest</li>
+    <li class="tag tag-tool">Ruff</li>
+    <li class="tag tag-tool">mypy</li>
+    <li class="tag tag-tech">Human-in-the-loop AI</li>
+    <li class="tag tag-tech">State machine design</li>
+    <li class="tag tag-tech">Role-based access control</li>
+    <li class="tag tag-tech">Audit trails</li>
+    <li class="tag tag-tech">Adversarial testing</li>
+    <li class="tag tag-system">PostgreSQL 17</li>
+    <li class="tag tag-system">Docker Compose</li>
+    <li class="tag tag-system">GitHub Actions</li>
+</ul>
+
+<h2>Overview</h2>
+<p>
+    OpsPilot is an AI-powered IT operations copilot with human-in-the-loop safety controls. It investigates simulated infrastructure incidents, proposes remediation steps, requires explicit human approval before making any change, and then verifies the result with fresh evidence before an incident is considered resolved. The whole project is built around one idea: operational AI has to be safe and auditable, not just plausible.
+</p>
+
+<h2>Problem / Goal</h2>
+<p>
+    Most AI agent demos stop the moment they produce a plausible-looking answer. They skip the parts that actually matter in operations: verifying that a fix worked, and making sure the system can't take a dangerous action on its own. I wanted to build something that treats operational work as a controlled state transition instead. In OpsPilot, diagnostics are strictly read-only, every state-changing action requires human approval, and every outcome has to be independently verified. The goal was to make operational AI something you could actually trust and test, rather than a black box that hopes for the best.
+</p>
+
+<h2>Approach</h2>
+<p>
+    OpsPilot runs on an explicit state machine that moves an incident through clearly defined phases: new, triaged, investigating, diagnosed, awaiting approval, approved, remediating, verifying, and finally resolved, escalated, or failed. A read-only investigator gathers evidence and cites it. A typed tool gateway enforces policy boundaries and prevents unrestricted shell access. Human approval is single-use and bound to the exact remediation payload, so an approval can't be reused or redirected. An independent verifier then collects post-action evidence to confirm the fix actually worked. Everything is written to an immutable PostgreSQL audit trail that cross-references all artifacts. Version 1 handles five closed fault families: stale DNS records, stopped SQL services, disk exhaustion, high CPU, and unreachable services. A deterministic simulator stands in for live infrastructure so every run is reproducible and testable.
+</p>
+
+<h2>Results / Outcome</h2>
+<p>
+    I measured OpsPilot against a set of scenario corpuses focused on both correctness and safety. The results:
+</p>
+<ul>
+    <li>Oracle-routed workflow execution: 100 / 100 completed successfully</li>
+    <li>Unsafe actions blocked: 0 / 100 slipped through the execution corpus</li>
+    <li>Approval-bypass attempts blocked: 10 / 10</li>
+    <li>Injection-boundary containment: 40 / 40</li>
+</ul>
+<p>
+    These numbers use different denominators and measure different things, so they shouldn't be combined into a single accuracy claim &mdash; but together they show the safety boundaries held up under adversarial testing.
+</p>
+
+<h2>Tech &amp; Architecture</h2>
+<p>
+    The backend is Python 3.12 built on FastAPI, Pydantic v2, SQLAlchemy, and Alembic, backed by PostgreSQL 17. The frontend is React 19 with TypeScript, built with Vite. The whole system runs through Docker Compose, with GitHub Actions validating every push and pull request. Quality is enforced with Pytest, Ruff, and mypy on the backend and ESLint on the frontend. There's an optional local Ollama provider, but it's disabled by default and limited to an advisory-only role &mdash; the safety-critical logic never depends on it.
+</p>
+
+<h2>What I Learned</h2>
+<p>
+    Building OpsPilot taught me that the hard part of an operational AI isn't getting it to propose a fix &mdash; it's proving the fix worked and guaranteeing the system can't act without a human in the loop. Designing the approval binding and the independent verifier forced me to think about trust as something you engineer and measure, not something you assume.
+</p>
+
+<h2>Links</h2>
+<ul>
+    <li>
+        <a href="https://github.com/coleseven/OpsPilot" target="_blank">
+            GitHub Repository
+        </a>
+    </li>
+</ul>
+
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>

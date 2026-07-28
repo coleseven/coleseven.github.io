@@ -2,53 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Digital Forensics CTF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Digital Forensics CTF — Cole Jones</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<nav>
-    <a href="/">Home</a> |
-    <a href="/projects/">Projects</a> |
-    <a href="/blog/">Blog</a>
-</nav>
-<hr>
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
 
 <h1>Digital Forensics CTF</h1>
 
+<ul class="tech-tags">
+    <li class="tag tag-tool">Autopsy</li>
+    <li class="tag tag-tool">FTK Imager</li>
+    <li class="tag tag-tool">ExifTool</li>
+    <li class="tag tag-tool">Steghide</li>
+    <li class="tag tag-tool">Stegseek</li>
+    <li class="tag tag-tool">RegRipper</li>
+    <li class="tag tag-tool">grep</li>
+    <li class="tag tag-tool">nmap</li>
+    <li class="tag tag-tech">Steganography</li>
+    <li class="tag tag-tech">Registry forensics</li>
+    <li class="tag tag-tech">Disk imaging</li>
+    <li class="tag tag-tech">CTF design</li>
+    <li class="tag tag-system">Raspberry Pi</li>
+    <li class="tag tag-system">Web server</li>
+</ul>
+
 <h2>Overview</h2>
 <p>
-    This project is a custom-built Digital Forensics Capture The Flag (CTF) event. This event was created and ran for the Digital Forensics undergraduate class at USCB.
+    This project is a custom-built Digital Forensics Capture the Flag (CTF) event that I created and ran for the undergraduate Digital Forensics class at USCB.
 </p>
 
 <h2>Problem / Goal</h2>
 <p>
-    The goal was to design a somewhat realistic, educational CTF event that would challenge the student. This event was created so that all students in the class would find some level of success.  
+    The goal was to design a realistic, educational CTF that would genuinely challenge students while still being built so that everyone in the class could find some level of success.
 </p>
 
 <h2>Approach</h2>
 <p>
-    Working with the professor of the Digital Forensics class, Dr. Comitz, we decided on having a 10 flag event. With the majority of the flags hidden in standalone files. 7 of the flags were hidden this way with the last 3 being contained in one file that required a multi-step process to find the flags.
+    Working with the professor of the Digital Forensics class, Dr. Comitz, we settled on a 10-flag event. The majority of the flags &mdash; 7 of them &mdash; were hidden in standalone files. The last 3 were contained in a single file that required a multi-step process to uncover.
 </p>
 
 <h2>Results / Outcome</h2>
 <p>
-    The outcome of the event was a success. All students that put effort into the event found some level of success. There were some issues with time but that was on the students as they had multiple days where they had 24/7 access to the files. The running of the event had minimal problems which was a huge improvement from last year's CTF event(Rogue Telnet). The biggest problem was that one of the flags operated from a webserver and the students were interacting with this webserver from Raspberry Pi's. For whatever reason the Pi's or the USCB network have issues resolving nmap scans. We had this same issue last year during the Rogue Telnet event. Another issue, which I believe is related to the previous issue, was that the Pi's struggled to maintain connection to the internet. This was an issue when the students were turning in their screenshots from the event. The easy solution for this was for the students to use a flash drive to get their files off of the Pi's and onto their normal computers.
+    The event was a success. Every student who put in effort found some level of success. There were some issues with time, but that was on the students &mdash; they had multiple days of 24/7 access to the files. The event itself ran with minimal problems, a huge improvement over last year's CTF (Rogue Telnet). The biggest problem was that one of the flags ran off a web server, and students were interacting with it from Raspberry Pis. For whatever reason, the Pis (or the USCB network) have trouble resolving nmap scans &mdash; the same issue I hit during last year's Rogue Telnet event. Related to that, the Pis also struggled to hold an internet connection, which became a problem when students were submitting their screenshots. The easy fix was to have them move their files off the Pis with a flash drive and onto their normal computers.
 </p>
 
-<h2>Tools & Technologies</h2>
-<ul>
-    <li>Autopsy / FTK Imager</li>
-    <li>ExifTool</li>
-    <li>Steghide & Stegseek</li>
-    <li>Regripper</li>
-    <li>Notepad</li>
-    <li>grep</li>
-</ul>
-
-<h2>What I Learned & Reflection</h2>
+<h2>What I Learned &amp; Reflection</h2>
 <p>
-    I learned that creating a CTF event that can cater to many skill levels is difficult. I am very easily able to create something everyone can do, but if I do this then there are a small handful of students that fly through the event without any struggle. I can also do the flip side of this and make the event very hard. Making it so that only a small handful of individuals could progress. This then results in a majority of the class being very frustrated. Finding the balance between these two ideas is very important. This event ended up being a bit too hard. I had about half the class find 9-10 flags and then the other half of the class was around 6-7 flags. I do not know how I could have made this much easier. The students that were successful finished the event in less than an hour, the students that struggled spent nearly 2 full class periods(90 minutes) to not find all the flags. I did create something for the people that made it through the event very quickly but I will talk about that in a different project.
+    I learned that building a CTF that caters to many skill levels is genuinely difficult. It's easy to create something everyone can finish, but then a handful of students fly through it without any struggle. The flip side &mdash; making it very hard &mdash; means only a few can make progress and most of the class ends up frustrated. Finding the balance between those two extremes is the hard part, and this event landed a little too far on the hard side. About half the class found 9&ndash;10 flags and the other half landed around 6&ndash;7. I'm still not sure how I could have made it much easier: the students who did well finished in under an hour, while the ones who struggled spent nearly two full class periods (90 minutes) and still didn't find everything. I did build something for the students who blew through it quickly, but I cover that in a separate project.
 </p>
 
 <h2>Links</h2>
@@ -60,9 +69,11 @@
     </li>
 </ul>
 
-<p><a href="/projects/">Back to Projects</a></p>
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
 
 </body>
 </html>
-
-

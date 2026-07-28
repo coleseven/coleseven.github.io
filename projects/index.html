@@ -2,46 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Projects</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Projects — Cole Jones</title>
     <link rel="stylesheet" href="/style.css">
-
 </head>
 <body>
-<nav>
-    <a href="/">Home</a> |
-    <a href="/projects/">Projects</a> |
-    <a href="/blog/">Blog</a>
-</nav>
-<hr>
 
-    <h1>Projects</h1>
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
 
-    <p>This page will list all major projects.</p>
+<h1>Projects</h1>
 
-    <ul>
-    <li>
-        <a href="/projects/traffic-camera-simulation/">
-            Traffic Camera Program and Simulation
-        </a>
+<p>An archive of my past and current projects. Each card shows the languages, tools, and techniques involved.</p>
+
+<ul class="tag-legend">
+    <li><span class="swatch" style="background:#e6f1fb;"></span>Languages</li>
+    <li><span class="swatch" style="background:#e1f5ee;"></span>Tools</li>
+    <li><span class="swatch" style="background:#eeedfe;"></span>Techniques</li>
+    <li><span class="swatch" style="background:#faeeda;"></span>Systems</li>
+</ul>
+
+<ul class="project-grid">
+    <li class="project-card">
+        <h3><a href="/projects/opspilot/">OpsPilot</a></h3>
+        <p class="summary">An AI-powered IT operations copilot with human-in-the-loop safety: it investigates simulated incidents, proposes fixes, requires human approval, and verifies the result.</p>
+        <ul class="tech-tags">
+            <li class="tag tag-lang">Python</li>
+            <li class="tag tag-lang">TypeScript</li>
+            <li class="tag tag-tool">FastAPI</li>
+            <li class="tag tag-tool">React</li>
+            <li class="tag tag-tech">Human-in-the-loop AI</li>
+            <li class="tag tag-system">PostgreSQL</li>
+            <li class="tag tag-system">Docker</li>
+        </ul>
     </li>
-    <li>
-        <a href="/projects/digital-forensics-ctf/">
-            Digital Forensics CTF
-        </a>
+
+    <li class="project-card">
+        <h3><a href="/projects/traffic-camera-simulation/">Traffic Camera Program and Simulation</a></h3>
+        <p class="summary">A 24/7 program that captures 35 public traffic cameras into daily videos, plus a simulation comparing three design versions.</p>
+        <ul class="tech-tags">
+            <li class="tag tag-lang">Python</li>
+            <li class="tag tag-lang">VBA</li>
+            <li class="tag tag-lang">Batch</li>
+            <li class="tag tag-tool">ffmpeg</li>
+            <li class="tag tag-tool">Excel</li>
+            <li class="tag tag-tech">Monte Carlo simulation</li>
+            <li class="tag tag-system">Windows Task Scheduler</li>
+        </ul>
     </li>
-    <li>
-        <a href="/projects/rogue-telnet-ctf/">
-            Rogue Telnet CTF
-        </a>
+
+    <li class="project-card">
+        <h3><a href="/projects/modeling-traffic-camera/">Modeling the Traffic Camera Recorder</a></h3>
+        <p class="summary">A discrete-event Monte Carlo simulation in Excel/VBA that models three versions of the traffic camera recorder to measure whether each design change was worthwhile.</p>
+        <ul class="tech-tags">
+            <li class="tag tag-lang">VBA</li>
+            <li class="tag tag-tool">Excel</li>
+            <li class="tag tag-tech">Monte Carlo simulation</li>
+            <li class="tag tag-tech">Discrete-event simulation</li>
+            <li class="tag tag-tech">Traffic modeling</li>
+        </ul>
     </li>
-    <li>
-        <a href="/projects/mystery-jpeg-ctf/">
-            Mystery.jpeg CTF
-        </a>
+
+    <li class="project-card">
+        <h3><a href="/projects/digital-forensics-ctf/">Digital Forensics CTF</a></h3>
+        <p class="summary">A custom 10-flag Capture The Flag event built and run for the Digital Forensics class at USCB.</p>
+        <ul class="tech-tags">
+            <li class="tag tag-tool">Autopsy</li>
+            <li class="tag tag-tool">FTK Imager</li>
+            <li class="tag tag-tool">ExifTool</li>
+            <li class="tag tag-tool">Steghide</li>
+            <li class="tag tag-tool">nmap</li>
+            <li class="tag tag-tech">Steganography</li>
+            <li class="tag tag-tech">Registry forensics</li>
+        </ul>
+    </li>
+
+    <li class="project-card">
+        <h3><a href="/projects/rogue-telnet-ctf/">Rogue Telnet CTF</a></h3>
+        <p class="summary">An introductory CTF built around a custom Telnet server on an odd port, for an Ethical Hacking class at USCB.</p>
+        <ul class="tech-tags">
+            <li class="tag tag-lang">Python</li>
+            <li class="tag tag-tool">nmap</li>
+            <li class="tag tag-tool">Telnet</li>
+            <li class="tag tag-tech">Custom server design</li>
+            <li class="tag tag-system">Linux</li>
+        </ul>
+    </li>
+
+    <li class="project-card">
+        <h3><a href="/projects/mystery-jpeg-ctf/">Mystery.jpeg CTF</a></h3>
+        <p class="summary">An expert-level forensics challenge built around a single image hiding a steganographic zip and a polyglot file.</p>
+        <ul class="tech-tags">
+            <li class="tag tag-tool">ExifTool</li>
+            <li class="tag tag-tool">Hex editors</li>
+            <li class="tag tag-tech">LSB steganography</li>
+            <li class="tag tag-tech">Polyglot files</li>
+            <li class="tag tag-tech">AES decryption</li>
+        </ul>
     </li>
 </ul>
 
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
 
-    <p><a href="/">Back to home</a></p>
 </body>
 </html>

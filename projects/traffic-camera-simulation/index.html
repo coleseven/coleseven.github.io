@@ -2,47 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Traffic Camera Program and Simulation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Traffic Camera Program and Simulation — Cole Jones</title>
     <link rel="stylesheet" href="/style.css">
-
 </head>
-<nav>
-    <a href="/">Home</a> |
-    <a href="/projects/">Projects</a> |
-    <a href="/blog/">Blog</a>
-</nav>
-<hr>
-
 <body>
-    <h1>Traffic Camera Program and Simulation</h1>
 
-    <h2>Overview</h2>
-    <p>
-        This project comes in two different parts. The first part is the program itself. The second part is the simulation I created to study the intitial program as it has been updated. The program itself takes images from public traffic cameras in the Beaufort area and compiles them into a video daily.
-    </p>
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
 
-    <h2>Program Progression</h2>
-    <p>
-        The initial version of this program(V1) downloaded images from 35 different cameras in parallel. This program polled every 2 seconds, downloading an image per camera every 2 seconds. V1 had issues with generating large traffic every 2 seconds and as well captured a large amount of duplicate images. V1 had a roughly 99% capture rate of unique images. The second version(V2) of this program used groups of cameras and within each group there is a small phase offset for each camera. For example, inside of a group, the first camera polls, then the second camera polls n seconds after the first, so on and so forth for the number of cameras in a group. This version of the program improved the large traffic spikes V1 had, with a very slight decrease in capture efficency down to 98%. This is due to the offset values. Lastly there is a third version of this program(V3) that I have been planning on implementing. This version of the program is a simple addition of a conditional GET statement to check if an image being downloaded is unique or a duplicate. If it is a duplicate it does not download. This version of the program does not exist yet but I studied it in my simulation of this program. 
-    </p>
-    <h2>Hardware and Automation</h2>
-    <p> On top of creating the software for this project, I as well build a PC that runs this program 24/7. This program is run on a Windows 10 PC(I would have prefered Linux but the individual I made this for wanted Windows). I won't go into detail on the PC specifications but most importantly it has a 256gb SSD and a 6tb HDD. This program is actually 2 separate programs, one is the recorder program, the other is a compiler. The recorder is run on the CPU, and the compiler utilizes ffmpeg GPU encoding. These programs are set to run using .bat scripts and the Task Scheduler in Windows. Specifically, the camera recorder script is running 24/7, every hour a simple .bat script is run to verify this program is running and if it is not, then it will reboot the program. Every night at 11:59, the compiler script runs and compiles all of yesterday's images. The compiler script removes all images once they are compiled as well as checks to see if there are more than 90 days worth of compiled videos. If it sees that there are more than 90 videos then it will delete the oldest video. The recorder program downloads videos onto the SSD, then the compiler, compiles the images and puts the file on the HDD. This is important for a few different reasons. Firstly, the read/write speed of the SSD is higher than the HDD so when compiling 35 videos, each made up of 24 hours of images being recorded(roughly every 3 seconds), the read/write speed will cause the program to take longer than desired to run. As well, this helped me to cut the cost of the PC down for my client, only needing to use one smaller SSD and a HDD instead of all SSDs. Finally this program runs on boot, the PC itself will autoboot so long as the computer gets power(and the CMOS battery doesn't die). </p>
-    <h2>Simulation</h2>
-    <p>
-        For the final project for Modeling and Simulations, I chose to study this program to see if my updated program made meaningful improvements as well as I looked at if my potential V3 change would as well have meaningful improvements. I used excel and VBA to create this simulation. I used data that I had gathered using some small python helper scripts to determine how often images actually post as well as the average size of the image taken. I created 3 different excel sheets to run each different version of the program(all included in the github repository).
-    </p>
+<h1>Traffic Camera Program and Simulation</h1>
 
-    <h2>Results</h2>
-    <p>
-        The simulations I created showed that from V1 to V2, the traffic burst nature of V1 was removed in favor of a smoother V2. From V2 to V3 the conditional GET statement was very beneficial as it forces the duplicate rate to zero. Which is very useful as I will be able to add more cameras to the program if needed without having to update hardware.
-    </p>
+<ul class="tech-tags">
+    <li class="tag tag-lang">Python</li>
+    <li class="tag tag-lang">VBA</li>
+    <li class="tag tag-lang">Batch</li>
+    <li class="tag tag-tool">Excel</li>
+    <li class="tag tag-tool">ffmpeg</li>
+    <li class="tag tag-tech">Monte Carlo simulation</li>
+    <li class="tag tag-tech">Parallel downloading</li>
+    <li class="tag tag-tech">Conditional GET</li>
+    <li class="tag tag-system">Windows Task Scheduler</li>
+    <li class="tag tag-system">PC build</li>
+</ul>
 
-    <h2>Tools & Technologies</h2>
-    <ul>
-        <li>Python</li>
-        <li>Excel (VBA)</li>
-        <li>Monte Carlo simulation</li>
-    </ul>
+<h2>Overview</h2>
+<p>
+    This project comes in two parts. The first is the program itself; the second is the simulation I built to study that program as it evolved. The program takes images from public traffic cameras in the Beaufort area and compiles them into a video each day.
+</p>
+
+<h2>Program Progression</h2>
+<p>
+    The first version (V1) downloaded images from 35 different cameras in parallel, polling every 2 seconds and downloading one image per camera each time. V1 worked, but it had two problems: it generated a large traffic spike every 2 seconds, and it captured a lot of duplicate images. Its unique-image capture rate was roughly 99%. The second version (V2) split the cameras into groups, with a small phase offset between each camera in a group &mdash; the first camera polls, the second polls a few seconds later, and so on through the group. This smoothed out the big traffic spikes from V1, at the cost of a very slight drop in capture efficiency (down to about 98%) caused by the offsets. The third version (V3) is one I've been planning to implement: it adds a conditional GET to check whether an image being downloaded is unique or a duplicate, and skips the download if it's a duplicate. V3 doesn't exist yet, but I studied it in my simulation.
+</p>
+
+<h2>Hardware and Automation</h2>
+<p>
+    On top of writing the software, I also built a PC to run this program 24/7. It runs on a Windows 10 machine &mdash; I would have preferred Linux, but the person I built it for wanted Windows. I won't go deep into the specs, but the important part is that it has a 256 GB SSD and a 6 TB HDD. The program is actually two separate programs: a recorder and a compiler. The recorder runs on the CPU, and the compiler uses ffmpeg GPU encoding. Both are scheduled with .bat scripts and the Windows Task Scheduler. The recorder script runs 24/7, and every hour a small .bat script checks that it's still running and restarts it if it isn't. Every night at 11:59, the compiler script runs and compiles all of the previous day's images. It also cleans up after itself: it deletes the images once they've been compiled, and if there are more than 90 days of compiled videos it deletes the oldest one.
+</p>
+<p>
+    The recorder downloads images onto the SSD, and the compiler then compiles them and writes the finished file to the HDD. This split matters for a couple of reasons. First, the SSD's read/write speed is higher than the HDD's, and when you're compiling 35 videos &mdash; each made from a full 24 hours of images captured roughly every 3 seconds &mdash; slow read/write really adds up. Second, it let me cut the cost of the PC for my client, since I only needed one smaller SSD plus a HDD instead of all SSDs. Finally, the whole thing runs on boot: the PC auto-boots as long as it has power (and the CMOS battery hasn't died).
+</p>
+
+<h2>Simulation</h2>
+<p>
+    For my final project in Modeling and Simulations, I chose to study this program to see whether my V2 update actually made meaningful improvements, and whether my potential V3 change would too. I built the simulation in Excel and VBA, using data I'd gathered with small Python helper scripts to determine how often images actually post and the average size of each image. I created three separate Excel sheets, one for each version of the program (all included in the GitHub repository). For a full breakdown of the simulation, its metrics, and the results, see the dedicated <a href="/projects/modeling-traffic-camera/">Modeling the Traffic Camera Recorder</a> project.
+</p>
+
+<h2>Results</h2>
+<p>
+    The simulations showed that from V1 to V2, the bursty traffic of V1 was smoothed out in favor of a much steadier V2. From V2 to V3, the conditional GET was very beneficial &mdash; it drives the duplicate rate to zero. That's genuinely useful, because it means I can add more cameras to the program without having to upgrade the hardware.
+</p>
 
 <h2>Links</h2>
 <ul>
@@ -52,16 +67,17 @@
         </a>
     </li>
     <li>
-        <a href="https://github.com/coleseven/Traffic-Camera-Recorder-and-Compiler/blob/main/Camera%20Recorder/Model%20Sims/ModSimsFinalZip/Modeling_Sims_Final_Writeup.pdf"
-           target="_blank">
+        <a href="https://github.com/coleseven/Modeling-Traffic-Camera-Recorder-and-Compiler/blob/main/docs/Modeling_Sims_Final_Writeup.pdf" target="_blank">
             Simulation Paper (PDF)
         </a>
     </li>
 </ul>
 
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
 
-    <p><a href="/projects/">Back to Projects</a></p>
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
 </body>
 </html>
-
-

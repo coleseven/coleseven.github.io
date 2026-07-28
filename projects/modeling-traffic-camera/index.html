@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modeling the Traffic Camera Recorder — Cole Jones</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
+
+<h1>Modeling the Traffic Camera Recorder</h1>
+
+<ul class="tech-tags">
+    <li class="tag tag-lang">VBA</li>
+    <li class="tag tag-tool">Excel</li>
+    <li class="tag tag-tech">Monte Carlo simulation</li>
+    <li class="tag tag-tech">Discrete-event simulation</li>
+    <li class="tag tag-tech">Triangular distribution</li>
+    <li class="tag tag-tech">Inverse-transform sampling</li>
+    <li class="tag tag-tech">Traffic / load modeling</li>
+</ul>
+
+<h2>Overview</h2>
+<p>
+    This is a discrete-event Monte Carlo simulation, built in Excel and VBA, of my
+    <a href="/projects/traffic-camera-simulation/">Traffic Camera Recorder</a> program &mdash; the program that captures 35 public traffic cameras and compiles them into daily videos. The recorder has gone through two shipped versions and a proposed third, and I built this simulation as my final project for a Modeling &amp; Simulations course to answer a real engineering question: did each version actually make a meaningful improvement, and could the design be tuned further?
+</p>
+
+<h2>Problem / Goal</h2>
+<p>
+    Rather than build the proposed third version of the recorder blind, I wanted to measure it first. The three designs are:
+</p>
+<ul>
+    <li><strong>V1 &mdash; parallel:</strong> all 35 cameras polled on their own thread every ~3 seconds. Simple, but it spiked network traffic on every poll and captured many duplicate images.</li>
+    <li><strong>V2 &mdash; grouped / phase-offset:</strong> cameras split into groups; within a group each camera polls at a small offset from the previous one, spreading the load over time.</li>
+    <li><strong>V3 &mdash; conditional GET (proposed):</strong> V2 plus a conditional GET, so a re-poll that returns an unchanged image is not downloaded again.</li>
+</ul>
+
+<h2>Approach</h2>
+<p>
+    Each version is a discrete-event model driven by two triangular distributions I fit from data I collected off the live cameras: inter-post time (how often a camera posts a new image) and image size. I wrote the whole thing in VBA rather than dragging spreadsheet formulas so the simulation could be dynamic &mdash; add or remove cameras, change group size, adjust the poll interval &mdash; without rebuilding the sheet each time. Random draws come from a triangular distribution implemented by inverse-transform sampling, and runs are seeded for repeatability. I measured each version with five metrics &mdash; capture efficiency, duplicate rate, poll efficiency, bytes per capture, and a waste factor &mdash; plus a bytes-downloaded-over-time series to visualize how bursty the traffic was.
+</p>
+
+<h2>Results</h2>
+<p>
+    Across a run of 100 posted images per camera, the simulation confirmed both design changes were worthwhile:
+</p>
+<ul>
+    <li><strong>V1 &rarr; V2 flattened the traffic.</strong> The bytes-over-time series dropped from ~700,000-byte spikes on every poll to a much smoother ~200,000-byte average &mdash; exactly the problem V2 was meant to solve. The summary metrics were otherwise nearly identical (capture efficiency about 0.01 lower, a direct cost of the offset).</li>
+    <li><strong>V2 &rarr; V3 roughly halved the data.</strong> The conditional GET drove the duplicate rate from ~0.50 to 0 and cut total bytes downloaded from ~1.2 billion to ~600 million, with bytes-per-capture nearly halved. That confirmed the proposed V3 change is worth building.</li>
+    <li><strong>Tuning:</strong> following the rule <em>offset = poll interval / cameras per group</em> keeps the system well-behaved (a group size of 4 worked best). No offset or group-size choice improved the headline metrics beyond that &mdash; but violating the rule makes V2 noticeably worse, degrading back toward V1's bursty behavior.</li>
+</ul>
+
+<h2>What I Learned</h2>
+<p>
+    The biggest lesson was about scope and structure. Converting my formula-driven sheet into dynamic VBA was the right call, but I paid for a weak initial design &mdash; I hadn't built the first file to be extended into the later versions, so I had to rebuild parts of it, and I referenced hard-coded cells instead of named ranges (something I'd never skip again). On the modeling side, I learned where my simulation was honest and where it was a simplification: using one shared distribution for every camera, rather than a per-camera "personality", is the main thing I'd fix to make the results line up more closely with the real program.
+</p>
+
+<h2>Links</h2>
+<ul>
+    <li>
+        <a href="https://github.com/coleseven/Modeling-Traffic-Camera-Recorder-and-Compiler" target="_blank">
+            GitHub Repository
+        </a>
+    </li>
+    <li>
+        <a href="https://github.com/coleseven/Modeling-Traffic-Camera-Recorder-and-Compiler/blob/main/docs/Modeling_Sims_Final_Writeup.pdf" target="_blank">
+            Full Writeup (PDF)
+        </a>
+    </li>
+    <li>
+        <a href="/projects/traffic-camera-simulation/">
+            Related: the Traffic Camera Recorder program itself
+        </a>
+    </li>
+</ul>
+
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>
