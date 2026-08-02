@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Training a Domain-Specific Cybersecurity LLM — Cole Jones</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
+
+<h1>Training a Domain-Specific Cybersecurity LLM</h1>
+
+<ul class="tech-tags">
+    <li class="tag tag-lang">Python</li>
+    <li class="tag tag-tech">LLM pre-training</li>
+    <li class="tag tag-tech">Supervised fine-tuning</li>
+    <li class="tag tag-tech">Synthetic data generation</li>
+    <li class="tag tag-tech">Dataset curation</li>
+    <li class="tag tag-tool">nanoGPT</li>
+    <li class="tag tag-tool">nanoChat</li>
+    <li class="tag tag-system">HPC cluster (Theia)</li>
+</ul>
+
+<h2>Overview</h2>
+<p>
+    This is a research project at the University of South Carolina Beaufort focused on training a domain-specific large language model (LLM) for cybersecurity &mdash; specifically, a model to help create <a href="/projects/rogue-telnet-ctf/">Capture the Flag (CTF)</a> events. I presented it as part of a team at USCB's Student Research &amp; Scholarship Day. The central question was whether people with limited LLM experience could build a useful, domain-specific model using only freely available, open-source tools. My role on the team was finding and creating the datasets the model was trained on.
+</p>
+
+<figure class="poster">
+    <a href="poster.jpg" target="_blank"><img src="poster.jpg" alt="Research poster titled 'Training a Domain Specific LLM' presented at USCB's Student Research and Scholarship Day"></a>
+    <figcaption>My research poster, presented at USCB's Student Research &amp; Scholarship Day. Click to view full size.</figcaption>
+</figure>
+
+<h2>The Research Question</h2>
+<p>
+    The project set out to answer a practical question: can individuals with limited experience with LLMs build a domain-specific model using freely available tools, with no budget? The broader motivation was to see whether this kind of domain-specific model could be useful across government, industry, and academia, and whether the approach could help democratize AI. The model itself was built on the open-source nanoGPT and nanoChat projects (from Andrej Karpathy) and trained on USC's Theia high-performance computing cluster.
+</p>
+
+<h2>My Role — Building the Datasets</h2>
+<p>
+    My contribution was the data. Training an LLM happens in stages &mdash; pre-training, mid-training, and supervised fine-tuning &mdash; and each stage needs a different kind of dataset. I built three in total:
+</p>
+<ul>
+    <li><strong>Two large long-form text datasets</strong> for pre-training and mid-training, assembled from books, textbooks, articles, and other long-form material.</li>
+    <li><strong>One ~250,000-token synthetic supervised fine-tuning (SFT) dataset</strong> &mdash; generated chat logs in a specific JSONL format with content and assistant tags, used to teach the model how to actually hold a conversation and respond.</li>
+</ul>
+<p>
+    Getting the data right turned out to be one of the two hardest parts of the whole project (the other being compute). Data is everywhere, but finding the <em>right</em> data &mdash; and getting it into the correct format for each training stage &mdash; is genuinely difficult, and several large public datasets we looked at had been taken down over copyright. That made creating our own data all the more important.
+</p>
+
+<h2>Results &amp; Conclusions</h2>
+<p>
+    The team's conclusion was that yes, you can build a domain-specific LLM with limited experience and no budget. Getting a basic LLM running isn't too hard; making it genuinely useful is the real challenge. The two big roadblocks are compute and data. We had no budget to spend, so we trained our own model on the free high-performance compute USCB provides (the Theia cluster), using data that was either open-source or that we created ourselves. The final model isn't as capable as flagship commercial models, but the point stood: with open tools, free compute, and self-made data, "anyone" can train their own LLM.
+</p>
+
+<h2>Lessons Learned</h2>
+<ul>
+    <li>Compute is expensive and hard to come by. A model usually has to be trained and fine-tuned many times, and each iteration costs more.</li>
+    <li>Finding or creating the right data is difficult, and it has to be in the correct format for each training stage.</li>
+    <li>Many large public datasets have been taken down due to copyright, which makes the ability to create your own data even more valuable.</li>
+</ul>
+
+<p><em>A team project with Michael Maxwell and Matthew Lisko, under faculty mentor Dr. Paul Comitz (USCB Department of Computer Science). My role was dataset creation.</em></p>
+
+<h2>Links</h2>
+<ul>
+    <li><a href="https://github.com/karpathy/nanochat" target="_blank">nanoChat (Andrej Karpathy)</a></li>
+    <li><a href="https://github.com/karpathy/nanoGPT" target="_blank">nanoGPT (Andrej Karpathy)</a></li>
+</ul>
+
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>

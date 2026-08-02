@@ -222,6 +222,23 @@ strong { font-weight: 600; }
     margin-bottom: 14px;
 }
 
+/* ===== Figures / images ===== */
+img { max-width: 100%; height: auto; }
+
+figure { margin: 22px 0; }
+
+figure img {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: block;
+}
+
+figcaption {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 8px;
+}
+
 /* ===== Content lists ===== */
 ul:not(.tech-tags):not(.tag-legend):not(.project-grid) { padding-left: 20px; }
 li { margin-bottom: 5px; }
