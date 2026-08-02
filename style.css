@@ -210,6 +210,18 @@ strong { font-weight: 600; }
     letter-spacing: 0.05em;
 }
 
+/* ===== Status badge (e.g. work in progress) ===== */
+.status-badge {
+    display: inline-block;
+    background: #faeeda;
+    color: #633806;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+}
+
 /* ===== Content lists ===== */
 ul:not(.tech-tags):not(.tag-legend):not(.project-grid) { padding-left: 20px; }
 li { margin-bottom: 5px; }

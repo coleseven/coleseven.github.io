@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SC Workers' Comp Legal AI Automation — Cole Jones</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
+
+<h1>SC Workers' Comp Legal AI Automation</h1>
+
+<span class="status-badge">Work in progress</span>
+
+<ul class="tech-tags">
+    <li class="tag tag-lang">Python</li>
+    <li class="tag tag-tech">Vision LLMs</li>
+    <li class="tag tag-tech">Document extraction</li>
+    <li class="tag tag-tech">Cross-model verification</li>
+    <li class="tag tag-tech">Automated triage</li>
+    <li class="tag tag-tech">Human-in-the-loop</li>
+    <li class="tag tag-system">Local / on-prem AI</li>
+</ul>
+
+<h2>Overview</h2>
+<p>
+    This is an in-progress system that automates the document intake work at the heart of a South Carolina Workers' Compensation legal practice. Workers' comp cases generate a constant stream of standardized state forms, medical records, and correspondence, and handling all of it by hand is slow, repetitive, and easy to get wrong. This system hands that intake work to a pipeline of AI models that read, understand, extract, double-check, and triage each case &mdash; while keeping a human in control of anything that actually matters.
+</p>
+
+<h2>The Problem</h2>
+<p>
+    A workers' comp practice has to take in a large volume of documents, and every one of them has to be identified, have its key facts pulled out, and be checked against what the case still needs. Done manually, this is a major time sink and a common source of errors. The goal of this project is to automate the entire intake step in a way that is fast, accurate, and trustworthy enough to use on real legal work.
+</p>
+
+<h2>How the AI Is Used</h2>
+<p>
+    The most interesting part of this project is how the AI is layered. Instead of throwing a document at a single model and trusting whatever comes back, the system runs each document through a sequence of specialized AI steps, each doing one job well:
+</p>
+<ul>
+    <li><strong>Reading:</strong> a vision model "sees" scanned and photographed documents the way a person would, so even messy, low-quality scans can be understood.</li>
+    <li><strong>Extracting:</strong> a language model then pulls out the structured facts that matter &mdash; the people involved, key dates, medical findings, work restrictions, compensation details, and more.</li>
+    <li><strong>Verifying:</strong> a second, independent model re-checks the highest-stakes facts against the original text. If the two models disagree, the fact is flagged for review instead of trusted. This has already caught real mistakes, like confusing an attorney for the injured worker.</li>
+    <li><strong>Triaging:</strong> the system then looks at the case as a whole &mdash; it detects which required documents are still missing, assigns an urgency level, and routes anything uncertain into a human review queue.</li>
+</ul>
+<p>
+    The design principle running through all of it is that AI does the heavy lifting, but nothing high-stakes is ever accepted without either a verification step or a human's sign-off. It's less about replacing the person and more about handing them a case that's already been read, organized, and pre-checked.
+</p>
+
+<h2>Privacy by Design</h2>
+<p>
+    Because this handles sensitive legal and medical information, the whole pipeline is built to run locally and privately rather than sending case data out to an external service. Sensitive documents are also deliberately walled off from any general-purpose AI processing, so client information stays contained.
+</p>
+
+<h2>Status</h2>
+<p>
+    This is an active work in progress. The core intake, extraction, verification, and triage pipeline already runs end-to-end on synthetic test cases, and I'm continuing to widen the range of documents it handles and harden it for real-world use. It's the clearest example of where my focus is right now: taking a real, messy, high-stakes workflow and figuring out how to apply AI to it responsibly &mdash; leaning on models where they're strong, and building in verification and human oversight where they aren't.
+</p>
+
+<p><em>The source for this project is private, and a demo walkthrough is planned.</em></p>
+
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>
