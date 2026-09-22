@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evaluating &amp; Optimizing a Cybersecurity LLM — Cole Jones</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
+
+<h1>Evaluating &amp; Optimizing a Cybersecurity LLM</h1>
+
+<ul class="tech-tags">
+    <li class="tag tag-lang">Python</li>
+    <li class="tag tag-tech">Supervised fine-tuning</li>
+    <li class="tag tag-tech">Direct Preference Optimization</li>
+    <li class="tag tag-tech">LoRA</li>
+    <li class="tag tag-tech">Rejection sampling</li>
+    <li class="tag tag-tech">Synthetic data generation</li>
+    <li class="tag tag-tech">CTF design</li>
+    <li class="tag tag-tool">PyTorch</li>
+    <li class="tag tag-system">CUDA</li>
+</ul>
+
+<h2>Overview</h2>
+<p>
+    This is a continuation of the <a href="/projects/domain-specific-llm/">domain-specific cybersecurity LLM</a> research project at USCB. After the team trained nanochat (a 1.38B-parameter model based on Andrej Karpathy's nanoChat) and I built the training datasets, I independently designed an evaluation harness and ran six systematic experiments to push the model from producing valid CTF challenge specs 17.5% of the time to 97.5% &mdash; an 80-percentage-point improvement using only a single RTX 3080 Ti.
+</p>
+<p>
+    Each experiment demonstrates a different ML technique &mdash; inference-time scaling, hyperparameter search, self-play data curation, retrieval-augmented generation, preference optimization, and technique composition &mdash; with all results measured against the same deterministic structural validator and 40 held-out evaluation prompts, making every comparison apples-to-apples.
+</p>
+
+<h2>The Problem</h2>
+<p>
+    The SFT-v2 baseline model (LoRA rank 32, targets c_q/c_v, trained on 525 augmented examples) could generate text that looked like CTF challenge specs, but only 17.5% of its outputs were fully valid &mdash; meaning all seven required fields (title, category, difficulty, description, artifact, flag, solution) were present and the flag used the correct <code>flag{...}</code> format. The main bottleneck was the flag field: only 22.5% of outputs included a properly formatted flag.
+</p>
+<p>
+    The goal was to find out which post-training and inference techniques could close this gap, how they compare, and whether they compose.
+</p>
+
+<h2>Eval Framework</h2>
+<p>
+    Every experiment shares the same evaluation pipeline: 40 held-out prompts spanning 7 CTF categories and 3 difficulty levels, scored by a deterministic structural validator that checks each of the 7 required spec fields. The key metrics are:
+</p>
+<ul>
+    <li><strong>SV%</strong> &mdash; Structural Validity: all 7 fields present and non-empty</li>
+    <li><strong>FV%</strong> &mdash; Fully Valid Strict: SV plus the flag matches <code>flag{...}</code></li>
+    <li><strong>MFS</strong> &mdash; Mean Field Score: average fraction of fields passing (0.0&ndash;1.0)</li>
+</ul>
+
+<h2>The Experiments</h2>
+
+<h3>1. Best-of-N Rejection Sampling</h3>
+<p>
+    Generate N candidates per prompt and select the one with the highest validator score &mdash; trading inference compute for quality with zero additional training. This is the simplest inference-time scaling technique: no reward model, no retraining, just a deterministic verifier the pipeline already has.
+</p>
+<table>
+    <thead><tr><th>N</th><th>SV%</th><th>FV%</th><th>MFS</th><th>Cost</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>77.5%</td><td>17.5%</td><td>0.829</td><td>1x</td></tr>
+        <tr><td>2</td><td>95.0%</td><td>32.5%</td><td>0.893</td><td>2x</td></tr>
+        <tr><td>4</td><td>95.0%</td><td>57.5%</td><td>0.929</td><td>4x</td></tr>
+        <tr><td>8</td><td>95.0%</td><td>77.5%</td><td>0.961</td><td>8x</td></tr>
+        <tr><td>16</td><td>97.5%</td><td>95.0%</td><td>0.982</td><td>16x</td></tr>
+    </tbody>
+</table>
+<p>
+    The biggest jump comes from N=1 to N=2 (+17.5pp SV%), confirming the model has high output variance. The flag field is the primary beneficiary &mdash; its pass rate climbs from 22.5% to 97.5% across the sweep, consistent with a binomial model of per-attempt success probability. No mode collapse was detected at any N.
+</p>
+
+<h3>2. LoRA Configuration Sweep</h3>
+<p>
+    Grid search over rank {8, 16, 32, 64} and target projections {c_q/c_v, c_q/c_k/c_v, c_q/c_k/c_v/c_proj} &mdash; 12 configurations total, all trained on the same 525-example dataset with alpha = 2x rank.
+</p>
+<table>
+    <thead><tr><th>Config</th><th>Params</th><th>SV%</th><th>FV%</th><th>MFS</th></tr></thead>
+    <tbody>
+        <tr class="highlight-row"><td>r8_qkvp</td><td>3.8M</td><td>87.5%</td><td>35.0%</td><td>0.889</td></tr>
+        <tr><td>r16_qkv</td><td>3.5M</td><td>95.0%</td><td>27.5%</td><td>0.875</td></tr>
+        <tr><td>r32_qkv</td><td>7.1M</td><td>92.5%</td><td>35.0%</td><td>0.875</td></tr>
+        <tr><td>r32_qv (baseline)</td><td>4.7M</td><td>80.0%</td><td>7.5%</td><td>0.832</td></tr>
+        <tr><td>r8_qv (worst)</td><td>1.2M</td><td>52.5%</td><td>10.0%</td><td>0.711</td></tr>
+    </tbody>
+</table>
+<p>
+    The key finding: <strong>target selection matters more than rank.</strong> At rank 8, expanding from 2 to 4 attention projection targets improves MFS by +0.178 &mdash; while increasing rank from 8 to 64 on the same targets gains only +0.135. The winner, r8_qkvp (rank 8, all 4 projections), achieves the best overall quality with fewer parameters than the baseline. This contradicts the common heuristic of "just use c_q and c_v" from the original LoRA paper, which was validated on much larger datasets.
+</p>
+
+<h3>3. Self-Play SFT (Data Flywheel)</h3>
+<p>
+    An iterative loop: generate outputs with the current model, filter by the structural validator (keep only outputs scoring at least 6/7 fields), append the valid outputs to the training data, retrain from the base checkpoint, and repeat.
+</p>
+<table>
+    <thead><tr><th>Round</th><th>Examples</th><th>SV%</th><th>FV%</th><th>MFS</th></tr></thead>
+    <tbody>
+        <tr><td>0 (baseline)</td><td>525</td><td>77.5%</td><td>17.5%</td><td>0.829</td></tr>
+        <tr><td>1</td><td>537</td><td>75.0%</td><td>20.0%</td><td>0.839</td></tr>
+        <tr><td>2</td><td>551</td><td>85.0%</td><td>17.5%</td><td>0.846</td></tr>
+        <tr><td>3</td><td>571</td><td>80.0%</td><td>30.0%</td><td>0.868</td></tr>
+    </tbody>
+</table>
+<p>
+    The flywheel works &mdash; slowly. After 3 rounds, FV% improves by +12.5pp and the data keep rate rises from 20% to 33%, confirming a positive feedback loop. But the model's own valid outputs are similar enough to existing data that the marginal signal is weak. Self-play is useful for bootstrapping from very little data, but it is not the highest-impact method.
+</p>
+
+<h3>4. RAG-Augmented Generation (Negative Result)</h3>
+<p>
+    Retrieve a relevant training example at inference time as few-shot context, testing three strategies: category match, category + difficulty match, and TF-IDF similarity.
+</p>
+<table>
+    <thead><tr><th>Strategy</th><th>SV%</th><th>FV%</th><th>MFS</th></tr></thead>
+    <tbody>
+        <tr><td>No RAG (baseline)</td><td>77.5%</td><td>17.5%</td><td>0.829</td></tr>
+        <tr><td>Category match</td><td>35.0%</td><td>20.0%</td><td>0.604</td></tr>
+        <tr><td>Category + difficulty</td><td>25.0%</td><td>10.0%</td><td>0.546</td></tr>
+        <tr><td>TF-IDF similarity</td><td>22.5%</td><td>7.5%</td><td>0.550</td></tr>
+    </tbody>
+</table>
+<p>
+    <strong>All RAG strategies performed worse than no retrieval.</strong> The model was fine-tuned on single-turn conversations and has never seen a prompt that includes a prior example followed by "now create a different one." The prepended context is out-of-distribution &mdash; the model interprets it as part of the user's request rather than as a formatting hint, causing confused and fragmented outputs. RAG requires either a model pre-trained for in-context learning or explicit few-shot fine-tuning. Honestly reporting negative results matters for credible research.
+</p>
+
+<h3>5. Direct Preference Optimization (DPO)</h3>
+<p>
+    Train the model to prefer structurally valid outputs over invalid ones, using the structural validator as an automated reward signal. For each training prompt, generate two candidates, score them, and keep pairs where the score gap is at least 0.1. This produced 59 preference pairs from 100 prompts &mdash; no human annotation needed.
+</p>
+<table>
+    <thead><tr><th>Metric</th><th>Baseline</th><th>DPO</th><th>Delta</th></tr></thead>
+    <tbody>
+        <tr><td>SV%</td><td>77.5%</td><td>85.0%</td><td>+7.5pp</td></tr>
+        <tr><td>FV%</td><td>17.5%</td><td>72.5%</td><td><strong>+55.0pp</strong></td></tr>
+        <tr><td>MFS</td><td>0.829</td><td>0.939</td><td>+0.110</td></tr>
+        <tr><td>Flag%</td><td>22.5%</td><td>85.0%</td><td><strong>+62.5pp</strong></td></tr>
+    </tbody>
+</table>
+<p>
+    DPO is the strongest single training-time technique by a wide margin. The flag field jumps from 22.5% to 85.0% &mdash; DPO excels at learning specific format rules. The key insight: <strong>any deterministic verifier can serve as a DPO reward signal</strong>, making this pattern applicable to any task with a programmatic quality checker (code compilation, test passing, format validation) without human annotation.
+</p>
+
+<h3>6. Stacking (Technique Composition)</h3>
+<p>
+    Stack the best techniques incrementally to test whether they compose or conflict: r8_qkvp LoRA config + DPO + self-play + Best-of-N.
+</p>
+<table>
+    <thead><tr><th>Configuration</th><th>SV%</th><th>FV%</th><th>MFS</th><th>Flag%</th></tr></thead>
+    <tbody>
+        <tr><td>r8_qkvp + DPO</td><td>92.5%</td><td>72.5%</td><td>0.950</td><td>75.0%</td></tr>
+        <tr><td>+ Self-play</td><td colspan="4"><em>regressed in every round (FV% dropped to 37&ndash;47%)</em></td></tr>
+        <tr><td>+ BoN (N=2)</td><td>97.5%</td><td>90.0%</td><td>0.982</td><td>92.5%</td></tr>
+        <tr><td>+ BoN (N=4)</td><td>97.5%</td><td>92.5%</td><td>0.989</td><td>95.0%</td></tr>
+        <tr class="highlight-row"><td>+ BoN (N=8)</td><td>97.5%</td><td>97.5%</td><td>0.996</td><td>100.0%</td></tr>
+    </tbody>
+</table>
+<p>
+    Two findings emerged. <strong>DPO and Best-of-N compose</strong> &mdash; they operate at different levels (training-time model improvement vs. inference-time selection), and DPO halves the N required: N=8 on the DPO model matches N=16 on the SFT-v2 baseline, cutting inference cost in half for the same quality. <strong>Self-play conflicts with DPO</strong> &mdash; retraining LoRA weights from scratch overwrites the DPO-learned preferences, causing every self-play round to regress. The design principle: techniques compose when they operate at different abstraction levels and conflict when they compete at the same level.
+</p>
+
+<h2>Results</h2>
+<p>The full optimization trajectory, from baseline to best stacked result:</p>
+<table>
+    <thead><tr><th>#</th><th>Method</th><th>SV%</th><th>FV%</th><th>MFS</th><th>Training?</th><th>Inference</th></tr></thead>
+    <tbody>
+        <tr class="highlight-row"><td>1</td><td>DPO + BoN (N=8)</td><td>97.5%</td><td>97.5%</td><td>0.996</td><td>Yes</td><td>8x</td></tr>
+        <tr><td>2</td><td>BoN N=16 (SFT-v2)</td><td>97.5%</td><td>95.0%</td><td>0.982</td><td>No</td><td>16x</td></tr>
+        <tr><td>3</td><td>DPO + BoN (N=2)</td><td>97.5%</td><td>90.0%</td><td>0.982</td><td>Yes</td><td>2x</td></tr>
+        <tr><td>4</td><td>DPO (single-shot)</td><td>85.0%</td><td>72.5%</td><td>0.939</td><td>Yes</td><td>1x</td></tr>
+        <tr><td>5</td><td>LoRA r8_qkvp</td><td>87.5%</td><td>35.0%</td><td>0.889</td><td>Yes</td><td>1x</td></tr>
+        <tr><td>6</td><td>Self-play (round 3)</td><td>80.0%</td><td>30.0%</td><td>0.868</td><td>Yes</td><td>1x</td></tr>
+        <tr><td>7</td><td>RAG (category)</td><td>35.0%</td><td>20.0%</td><td>0.604</td><td>No</td><td>~2x</td></tr>
+        <tr><td>8</td><td>SFT-v2 baseline</td><td>77.5%</td><td>17.5%</td><td>0.829</td><td>&mdash;</td><td>1x</td></tr>
+    </tbody>
+</table>
+
+<p>The core practical result: <strong>training-time optimization multiplies the effectiveness of inference-time compute.</strong> DPO + BoN(N=2) at 2x inference cost matches what BoN alone needs N=8 for. All six experiments ran on a single RTX 3080 Ti in about 16.5 hours of total GPU time.</p>
+
+<h2>What I Learned</h2>
+<ul>
+    <li><strong>DPO with a deterministic verifier</strong> is a powerful and underused pattern. Any task where you can programmatically check output quality can skip human preference labels entirely.</li>
+    <li><strong>Negative results teach as much as positive ones.</strong> RAG failing on a small fine-tuned model highlights the gap between how RAG works on large pre-trained models (which learn in-context learning during pre-training) and small domain-specific ones.</li>
+    <li><strong>Hyperparameter sweeps pay for themselves.</strong> The LoRA sweep found that the original "reasonable default" ranked 9th out of 12 &mdash; a result I would never have guessed without systematic search.</li>
+    <li><strong>Composition has rules.</strong> Techniques compose across abstraction levels (training + inference) but conflict within the same level (two methods that both retrain LoRA weights). This principle generalizes beyond this project.</li>
+    <li><strong>An eval harness is the most important thing to build first.</strong> Having a deterministic, automated eval pipeline made it possible to run six experiments and compare them fairly. Without it, I would have been guessing.</li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+    <li><a href="/projects/domain-specific-llm/">Original project: Training a Domain-Specific Cybersecurity LLM</a></li>
+    <li><a href="https://github.com/karpathy/nanochat" target="_blank">nanoChat (Andrej Karpathy)</a></li>
+</ul>
+
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>

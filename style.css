@@ -239,6 +239,38 @@ figcaption {
     margin-top: 8px;
 }
 
+/* ===== Tables ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 0.9rem;
+}
+
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    border-bottom: 2px solid var(--border);
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr.highlight-row { background: var(--bg-soft); font-weight: 500; }
+
+@media (max-width: 640px) {
+    table { font-size: 0.82rem; }
+    th, td { padding: 6px 8px; }
+}
+
 /* ===== Content lists ===== */
 ul:not(.tech-tags):not(.tag-legend):not(.project-grid) { padding-left: 20px; }
 li { margin-bottom: 5px; }
