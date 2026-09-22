@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="An experiment-driven Mad Pod Racing AI project using a local simulator, CUDA, NEAT, evolution strategies, self-play, and statistical validation.">
+    <title>Evolving a Mad Pod Racing AI — Cole Jones</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <a class="brand" href="/">Cole Jones</a>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/projects/">Projects</a>
+    </nav>
+</header>
+
+<span class="status-badge">Active research project</span>
+<h1>Evolving a Mad Pod Racing AI</h1>
+<p class="project-deck">
+    I started with a few lines of steering logic and turned the problem into a local research environment: a tested physics simulator, CPU and CUDA evaluators, automated multi-hour training, replay analysis, neural topology search, self-play, and increasingly strict champion-selection gates. The interesting part has not just been making the bot faster. It has been learning which apparent improvements survive a larger test set, real opponents, four-pod collisions, and the transfer back to CodinGame.
+</p>
+
+<ul class="tech-tags">
+    <li class="tag tag-lang">Python</li>
+    <li class="tag tag-lang">C</li>
+    <li class="tag tag-tool">CUDA</li>
+    <li class="tag tag-tech">NEAT</li>
+    <li class="tag tag-tech">Evolution strategies</li>
+    <li class="tag tag-tech">Self-play</li>
+    <li class="tag tag-tech">Replay analysis</li>
+    <li class="tag tag-tech">Statistical validation</li>
+    <li class="tag tag-system">Local simulation</li>
+</ul>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-value">468k</span>
+        <span class="stat-label">simulated episodes/second in the fastest fixed-topology benchmark</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">100%</span>
+        <span class="stat-label">completion on the sealed 10,000-map solo path evaluation</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">2.216%</span>
+        <span class="stat-label">paired solo race-time improvement after learning BOOST timing</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">55.425%</span>
+        <span class="stat-label">sealed 1v1 win rate against the identical-policy baseline</span>
+    </div>
+</div>
+
+<h2>The goal and the rule I set for myself</h2>
+<p>
+    Mad Pod Racing is a CodinGame programming game with checkpoint racing, inertia, limited steering, collisions, a one-use BOOST, and a temporary high-mass SHIELD. Gold league expands the game to two pods per team, which changes it from pure pathfinding into a coupled racing and interference problem.
+</p>
+<p>
+    I deliberately treated the challenge as an unknown system. I used the official rules, my own match traces, and general algorithms, but did not look up competitors' solutions or challenge-specific strategy guides. That constraint made the project much more valuable: every behavior had to be proposed, implemented, measured, and either retained or rejected from our own evidence.
+</p>
+
+<div class="callout">
+    <p><strong>Core workflow:</strong> form a hypothesis, implement it, run controlled local experiments, seal a held-out test set, compare against an immutable champion, then check whether the result transfers to CodinGame.</p>
+</div>
+
+<h2>How the system evolved</h2>
+<ol class="experiment-list">
+    <li>
+        <h3>Heuristic driving and corner cutting</h3>
+        <p>The first bots simply aimed at the next checkpoint, reduced thrust for large heading errors, and saved BOOST for a long aligned segment. Remembering checkpoint locations across laps allowed the target point to move inside the checkpoint's 600-unit radius, producing a shorter racing line. This was enough to beat the early bosses, but four-pod collisions repeatedly knocked the bot off that ideal line.</p>
+    </li>
+    <li>
+        <h3>A local physics laboratory</h3>
+        <p>I built a referee from the official movement order: rotation, acceleration, movement and elastic collision resolution, friction, truncation, and rounding. A Python reference made debugging easy; a C/OpenMP implementation increased throughput; and a CUDA evaluator let thousands of candidate policies race in parallel. CPU, C, and CUDA parity tests guarded against gaining speed by silently changing the game.</p>
+    </li>
+    <li>
+        <h3>Learning the racing line from scratch</h3>
+        <p>An early parameter optimizer improved a hand-built controller but had limited room to discover new behavior. I then used NEAT to evolve a compact network from normalized pod-relative inputs. The successful solo run completed 25,333 generations, made 19 protected promotions, and produced a graph with 15 hidden nodes and 66 active connections. It completed all 1,024 fresh final maps in a mean 202.953 turns.</p>
+    </li>
+    <li>
+        <h3>Freeze topology, refine weights</h3>
+        <p>Once NEAT found a useful graph, I stopped paying the structural-search cost and refined its 83 active parameters with mirrored evolution strategies. The 12-hour run completed 324,363 generations. On 10,000 sealed maps it preserved 100% completion and lowered mean time from 202.8198 to 202.2164 turns. The improvement was only 0.328%, but the one-sided 95% lower bound was still positive at 0.301%.</p>
+    </li>
+    <li>
+        <h3>Learn BOOST, then introduce opponents</h3>
+        <p>A separate 25-parameter BOOST head learned a strong, reliable one-use timing policy quickly. Its sealed result improved race time from 203.3864 to 199.2077 turns, a paired 2.216% gain, while retaining 100% completion. I then added a residual interaction head for steering and thrust in side-swapped 1v1 races. The sealed duel champion won 55.425% of 20,000 episodes against the identical-policy baseline.</p>
+    </li>
+    <li>
+        <h3>SHIELD and two-pod teams</h3>
+        <p>SHIELD was added only after real opponents and collisions existed. In 2v2, I first froze one certified racer and trained a support pod, then jointly refined separate racer and support heads. The support phase reached 51.44% and the joint phase 51.435% against their immutable baselines, both with 100% completion. These were statistically real local improvements, but neither policy learned meaningful SHIELD use.</p>
+    </li>
+    <li>
+        <h3>Arena telemetry and an opponent league</h3>
+        <p>I built a collector for my own CodinGame Arena replays and normalized positions, actions, checkpoint transitions, and collision events. The first 48-game sample was 34 wins and 14 losses overall, but the newest ten games were only 1&ndash;9 as matchmaking became harder. Rather than trusting the flattering aggregate, I used the losses to build a persistent local opponent pool: general, collision-pressure, and SHIELD specialists, each independently validated against the frozen champion.</p>
+    </li>
+</ol>
+
+<h2>Results that held up</h2>
+<div class="results-table-wrap">
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>Experiment</th>
+                <th>Protected result</th>
+                <th>What it established</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Compact solo NEAT</td>
+                <td class="result-positive">100% completion; 202.953 mean turns</td>
+                <td>A small evolved topology could reliably navigate full races from scratch.</td>
+            </tr>
+            <tr>
+                <td>Fixed-topology ES</td>
+                <td class="result-positive">0.328% paired speed gain</td>
+                <td>Weight refinement still extracted a small, statistically supported improvement after topology search.</td>
+            </tr>
+            <tr>
+                <td>Learned BOOST</td>
+                <td class="result-positive">2.216% paired speed gain</td>
+                <td>A separately learned tactical head produced a much larger gain than more path-only optimization.</td>
+            </tr>
+            <tr>
+                <td>Shield-free 1v1</td>
+                <td class="result-positive">55.425% over 20,000 episodes</td>
+                <td>Opponent-relative control learned useful collision-era behavior beyond identical racing.</td>
+            </tr>
+            <tr>
+                <td>Support-pod 2v2</td>
+                <td class="result-positive">51.44%; zero timeouts</td>
+                <td>Fixed racer/support roles could improve jointly measured team outcomes without sacrificing reliability.</td>
+            </tr>
+            <tr>
+                <td>CUDA optimization</td>
+                <td class="result-positive">up to ~468k episodes/second</td>
+                <td>The project could evaluate millions of races locally, making sealed tests and large populations practical.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h2>What failed, regressed, or stagnated</h2>
+<p>The unsuccessful runs became some of the most useful parts of the project because they exposed weaknesses in the experimental process rather than just weaknesses in one policy.</p>
+
+<div class="two-column">
+    <div class="evidence-card">
+        <h3>Longer training was not automatically better</h3>
+        <ul>
+            <li>An overnight continuation accumulated 3,186 local promotions, yet won only 38.879% in a large direct evaluation against its source.</li>
+            <li>A champion-hall run stopped after 27,250 generations with zero promotions.</li>
+            <li>The external-opponent run completed 153,025 generations in 12 hours and still admitted no new champion.</li>
+        </ul>
+    </div>
+    <div class="evidence-card">
+        <h3>SHIELD did not emerge naturally</h3>
+        <ul>
+            <li>A SHIELD-trained incumbent had one timeout, so the reliability gate correctly selected the shield-free fallback.</li>
+            <li>The selected 2v2 support policy used SHIELD only twice across 20,000 final episodes.</li>
+            <li>The joint policy averaged 0.025 SHIELD activations per episode and almost no shielded collisions.</li>
+        </ul>
+    </div>
+    <div class="evidence-card">
+        <h3>Replay imitation was not enough</h3>
+        <ul>
+            <li>Behavioral clones were fitted to 6,478 opponent actions from Arena losses.</li>
+            <li>None was strong enough for direct admission; the closest still allowed the frozen champion a 56.93% win rate.</li>
+            <li>They remained useful as diverse initialization, not as proof that the original opponent had been reproduced.</li>
+        </ul>
+    </div>
+    <div class="evidence-card">
+        <h3>Local gains did not guarantee Arena dominance</h3>
+        <ul>
+            <li>The bot reached first place in Gold during testing, but did not consistently beat the league boss.</li>
+            <li>The 48-game Arena total was 70.83%, while the newest ten fell to 10% as opponent strength increased.</li>
+            <li>This forced evaluation to focus on paired seeds, opponent difficulty, and recent performance rather than one headline percentage.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="callout caution">
+    <p><strong>The central plateau:</strong> training sampled one opponent per generation and optimized average reward, while promotion required simultaneous statistical dominance over every retained opponent. One challenger beat the incumbent, pressure specialist, and SHIELD specialist, but won only 47.27% against the general specialist. The optimizer was finding specialists; the gate demanded a generalist.</p>
+</div>
+
+<h2>Engineering lessons</h2>
+<ul>
+    <li><strong>Reliability needs to be a hard constraint.</strong> A faster policy with even one timeout was not allowed to replace a 100%-completing champion.</li>
+    <li><strong>Never evaluate only against the current policy.</strong> Immutable champions, historical opponents, specialists, fresh maps, and side swapping prevented several apparent gains from being accepted.</li>
+    <li><strong>Keep the reward aligned with the acceptance test.</strong> Optimizing an average mixture and certifying worst-opponent performance created a measurable training/gate mismatch.</li>
+    <li><strong>Measure interaction consequences, not just collision count.</strong> Arena wins actually had more cross-team contacts than losses in one paired sample, while losses had more teammate collisions. Contact itself was not inherently good or bad.</li>
+    <li><strong>Profile the entire pipeline.</strong> In the first NEAT implementation, Python speciation, reproduction, and network packing were more limiting than the GPU physics kernel. Compiling and vectorizing those stages nearly doubled full-generation throughput.</li>
+    <li><strong>Preserve failed ideas as evidence.</strong> Every sealed fallback, rejected clone, stagnant run, and crash-recovered checkpoint narrowed the next experiment.</li>
+</ul>
+
+<h2>Current experiment</h2>
+<p>
+    The next test directly addresses the objective mismatch. Every mirrored perturbation will be evaluated against the incumbent and all three specialist opponents on the same fresh maps. The simulator budget remains exactly 16,384 episodes per generation, but each opponent receives its own rank-shaped gradient. Pairwise gradient cosines will show whether the objectives agree or conflict before I choose among a simple mean, PCGrad, MGDA, or group-DRO weighting.
+</p>
+<p>
+    The first arm intentionally uses the arithmetic mean. That isolates opponent balancing from more complicated conflict-resolution methods. The certification standard stays unchanged: 100% completion, zero timeouts, and a positive one-sided 95% result against every protected opponent.
+</p>
+
+<h2>Takeaway</h2>
+<p>
+    The project progressed from “point at the next checkpoint” to a reproducible experimental platform capable of evaluating hundreds of thousands of simulated races per second. It produced real improvements in racing, BOOST timing, and head-to-head control, but it also demonstrated how easily evolutionary training can overfit a small gate, drift during self-play, ignore a seemingly useful action, or specialize against the wrong opponent. The main result is not one final neural network. It is the increasingly rigorous process used to decide whether a network is actually better.
+</p>
+
+<h2>Link</h2>
+<ul>
+    <li><a href="https://www.codingame.com/ide/puzzle/mad-pod-racing" target="_blank" rel="noopener">Official Mad Pod Racing challenge</a></li>
+</ul>
+
+<p class="back-link"><a href="/projects/">&larr; Back to Projects</a></p>
+
+<footer class="site-footer">
+    <p>Cole Jones &middot; <a href="mailto:colewj@email.uscb.edu">colewj@email.uscb.edu</a> &middot; <a href="https://github.com/coleseven" target="_blank">GitHub</a></p>
+</footer>
+
+</body>
+</html>
