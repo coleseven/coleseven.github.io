@@ -46,15 +46,53 @@
     The goal was to find out which post-training and inference techniques could close this gap, how they compare, and whether they compose.
 </p>
 
-<h2>Eval Framework</h2>
+<h2>Eval Harness &amp; Rubric</h2>
 <p>
-    Every experiment shares the same evaluation pipeline: 40 held-out prompts spanning 7 CTF categories and 3 difficulty levels, scored by a deterministic structural validator that checks each of the 7 required spec fields. The key metrics are:
+    Before running any experiments, I built a fully automated evaluation harness so that every method could be measured on the same terms. The harness has three stages: a fixed prompt set, a tolerant parser, and a deterministic rubric. No step involves human judgment &mdash; the entire pipeline runs end-to-end without intervention, which is what made it practical to compare six experiments fairly.
+</p>
+
+<h3>The Eval Prompts</h3>
+<p>
+    The test set is 40 held-out prompts that the model never sees during training. They span 7 CTF categories (web, crypto, forensics, steganography, reverse engineering, binary exploitation, miscellaneous) and 3 difficulty levels (easy, medium, hard), with each prompt asking the model to design a specific type of challenge &mdash; for example, "Design a medium crypto challenge involving RSA with a small public exponent and no padding." The prompts are detailed enough to constrain the topic but open-ended enough that the model must generate the full spec structure on its own.
+</p>
+
+<h3>The Parser</h3>
+<p>
+    The model outputs free-form text, not structured JSON, so the first step is parsing. The parser uses regex-based extraction with fallback patterns to handle the variety of formatting styles the model produces &mdash; markdown headers, <code>key: value</code> lines, quoted strings, and variations in field naming (e.g., "solution," "intended solve path," and "walkthrough" all map to the solution field). The parser is deliberately tolerant: it tries to find each field rather than requiring a rigid format, so the rubric measures content quality rather than formatting compliance.
+</p>
+
+<h3>The Rubric</h3>
+<p>
+    Once parsed, each output is scored against a 7-field rubric. Every field is checked for presence and well-formedness:
+</p>
+<table>
+    <thead><tr><th>Field</th><th>Present</th><th>Valid</th></tr></thead>
+    <tbody>
+        <tr><td>Title</td><td>Non-empty</td><td>2&ndash;100 characters</td></tr>
+        <tr><td>Category</td><td>Non-empty</td><td>Matches a known CTF category (web, crypto, forensics, stego, rev, pwn, misc, osint, etc.)</td></tr>
+        <tr><td>Difficulty</td><td>Non-empty</td><td>Matches a known difficulty level (easy, medium, hard, and synonyms like beginner, intermediate, expert)</td></tr>
+        <tr><td>Description</td><td>Non-empty</td><td>At least 20 characters (rejects trivially short stubs)</td></tr>
+        <tr><td>Artifact</td><td>Non-empty</td><td>Present only (any artifact description counts)</td></tr>
+        <tr><td>Flag</td><td>Non-empty</td><td>Matches the <code>flag{...}</code> regex pattern</td></tr>
+        <tr><td>Solution</td><td>Non-empty</td><td>At least 20 characters</td></tr>
+    </tbody>
+</table>
+<p>
+    Each field contributes equally to a <strong>field score</strong> of 0/7 to 7/7. From these per-field scores, three aggregate metrics are computed:
 </p>
 <ul>
-    <li><strong>SV%</strong> &mdash; Structural Validity: all 7 fields present and non-empty</li>
-    <li><strong>FV%</strong> &mdash; Fully Valid Strict: SV plus the flag matches <code>flag{...}</code></li>
-    <li><strong>MFS</strong> &mdash; Mean Field Score: average fraction of fields passing (0.0&ndash;1.0)</li>
+    <li><strong>SV% (Structural Validity)</strong> &mdash; All 7 fields present and valid, except the flag only needs to be present (any format). This measures whether the model produces a complete spec.</li>
+    <li><strong>FV% (Fully Valid Strict)</strong> &mdash; All 7 fields present and valid, including the flag matching <code>flag{...}</code>. This is the strictest metric and the primary one I optimized for &mdash; it measures whether the output is actually usable as a CTF challenge.</li>
+    <li><strong>MFS (Mean Field Score)</strong> &mdash; The average fraction of fields passing validation across all outputs (0.0&ndash;1.0). This captures partial improvements that the binary SV/FV metrics miss &mdash; a model that consistently gets 6/7 fields right scores higher than one that alternates between 7/7 and 3/7.</li>
 </ul>
+
+<h3>Why This Design</h3>
+<p>
+    The rubric is intentionally structural, not semantic. It does not judge whether a challenge is creative, realistic, or pedagogically sound &mdash; only whether the output contains the fields a CTF organizer needs, in a usable format. This is a deliberate tradeoff: a deterministic rubric can run thousands of times with perfect consistency, which is essential for comparing experiments, but it cannot catch a challenge with a correct structure but nonsensical content. For this project, structural validity was the binding constraint &mdash; the baseline model's 17.5% FV rate meant the model could not reliably produce the right fields, let alone produce good content in them. Fixing structure had to come first.
+</p>
+<p>
+    The same validator also serves double duty: it scores outputs for evaluation <em>and</em> acts as the reward signal for DPO (Experiment 5) and the filter for self-play (Experiment 3). This is possible precisely because the rubric is deterministic and fast &mdash; no GPU needed, runs in milliseconds.
+</p>
 
 <h2>The Experiments</h2>
 
