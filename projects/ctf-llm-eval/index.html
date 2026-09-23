@@ -201,6 +201,87 @@
     Two findings emerged. <strong>DPO and Best-of-N compose</strong> &mdash; they operate at different levels (training-time model improvement vs. inference-time selection), and DPO halves the N required: N=8 on the DPO model matches N=16 on the SFT-v2 baseline, cutting inference cost in half for the same quality. <strong>Self-play conflicts with DPO</strong> &mdash; retraining LoRA weights from scratch overwrites the DPO-learned preferences, causing every self-play round to regress. The design principle: techniques compose when they operate at different abstraction levels and conflict when they compete at the same level.
 </p>
 
+<h2>Sample Outputs</h2>
+<p>
+    Below are three outputs from the best model configuration (DPO + BoN N=8, 97.5% FV). Each passed the structural validator with a perfect 7/7 field score. They are reproduced verbatim &mdash; no editing, no cherry-picking beyond choosing outputs that span different categories.
+</p>
+
+<div class="sample-output">
+    <div class="sample-header">
+        <span class="sample-label">Sample 1 &mdash; Crypto / Easy</span>
+        <span class="sample-prompt">Prompt: &ldquo;Design a beginner-friendly crypto challenge using XOR encryption with a repeating key that is short enough for the player to recover through known-plaintext analysis.&rdquo;</span>
+    </div>
+    <pre class="sample-body">Title: Repeated Key XOR
+Category: Cryptography
+Difficulty: Easy
+Challenge Goal: Teach XOR encryption with a short repeated key.
+Creator Intent: Teach XOR encryption while keeping the key short enough to recover.
+Required Components: XOR key (shortest possible), repeating key.
+Intended Solve Path: The player uses known-plaintext analysis to decrypt
+  the key XORed with the short key.
+Flag Placement: The flag is provided as the result of the decryption.
+Hints: Hints include "key length is short, so recover from XOR with
+  short key" and "know known-plaintext can help recover."
+Learning Objective: Teach XOR encryption with a short key length.
+Flag Value: flag{x0r1w8n3}</pre>
+</div>
+
+<div class="sample-output">
+    <div class="sample-header">
+        <span class="sample-label">Sample 2 &mdash; Crypto / Medium</span>
+        <span class="sample-prompt">Prompt: &ldquo;Create a medium crypto challenge where an AES-CBC encrypted cookie can be manipulated through a bit-flipping attack to change the user role from guest to admin.&rdquo;</span>
+    </div>
+    <pre class="sample-body">Title: Multi-Role Identity
+Category: Cryptography
+Difficulty: Medium
+Challenge Goal: Decrypt the AES-CBC cookie and reveal the user role.
+Creator Intent: Teach players how to manipulate a single file without
+  side effects.
+Required Components: AES-CBC-encrypted cookie with the following structure:
+- cookie_name: A small block of bytes containing the user role.
+- AES-CBC signature that uses a bit flip to recover the original value.
+- A random value that is used for the bit flip.
+Intended Solve Path: Players first verify the AES-CBC signature without
+  the bit flip, then they apply it to the provided cookie block. The bit
+  flip alters the length of the block, revealing the user role. They must
+  then verify the decrypted value to confirm the role.
+Flag Placement: The flag is hidden in the final encrypted block.
+Hints: "AES-CBC only works on single blocks" and "Random bits can be
+  flipped."
+Completed Design: The challenge is set in the following steps:
+- The AES-CBC signature is valid but not the only way to decrypt the cookie.
+- The user role is hidden in the cookie block.
+- The bit flip is applied to the format of the AES-CBC signature.
+- The decrypted value is found in the length of the decrypted block.
+Intended Learning Value: Players learn how to decrypt a single file
+  without modifying the original.
+Flag Value: flag{c3r3n3}</pre>
+</div>
+
+<div class="sample-output">
+    <div class="sample-header">
+        <span class="sample-label">Sample 3 &mdash; Forensics / Medium</span>
+        <span class="sample-prompt">Prompt: &ldquo;Design a hard forensics challenge that requires analyzing a pcap network capture file to reconstruct an exfiltrated file transmitted over DNS queries.&rdquo;</span>
+    </div>
+    <pre class="sample-body">Title: Fingerprints in DNS
+Category: Forensics
+Difficulty: Medium
+Challenge Goal: Reconstruct a captured exfiltrating file from a DNS query.
+Creator Intent: Teach players how pcap networks capture data through
+  DNS queries.
+Required Components: A pcap network with a known public key, a pcap
+  server, and a DNS record in the host's cache.
+Intended Solve Path: Players recover the public key from the network
+  cache, reconstruct the DNS query, and then use the public key to
+  reconstruct the captured exfiltrating file.
+Flag Placement: The captured exfiltrating file contains the same name.
+Flag Value: flag{f4n3n3r3e3d}</pre>
+</div>
+
+<p>
+    These outputs show the model generating plausible challenge structures with correct flag formats, category-appropriate content, and multi-step solve paths. Limitations are visible too: the forensics output downgrades "hard" to "Medium" (the model defaults to medium difficulty regardless of the prompt), and the technical descriptions mix real concepts with imprecise language &mdash; "AES-CBC signature" is not standard terminology, for instance. This is expected from a 1.38B-parameter model. The structural validator confirms the outputs are <em>usable</em>; domain expertise is still needed to refine the content.
+</p>
+
 <h2>Results</h2>
 <p>The full optimization trajectory, from baseline to best stacked result:</p>
 <table>
